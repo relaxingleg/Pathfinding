@@ -2,6 +2,12 @@ package com.relaxingleg.pathfinding;
 
 import com.relaxingleg.pathfinding.io.Input;
 import com.relaxingleg.pathfinding.io.Window;
+import com.relaxingleg.pathfinding.render.Cell;
+import com.relaxingleg.pathfinding.render.Renderer;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main loop of the engine
@@ -12,6 +18,7 @@ public class Loop {
 
     private Window window;
     private Input input;
+    private Renderer renderer;
     private float deltaTime;
 
     /**
@@ -26,6 +33,7 @@ public class Loop {
     private Loop() {
         window = new Window(1920, 1080, "Pathfinding");
         input = window.getInput();
+        renderer = new Renderer();
     }
 
     private void loop() {
@@ -47,9 +55,11 @@ public class Loop {
 
     private void render() {
         window.render();
+        renderer.render(List.of(new Cell(0, 0, new Vector3f())), 10);
     }
 
     private void cleanUp() {
         window.cleanUp();
+        renderer.cleanUp();
     }
 }
