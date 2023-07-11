@@ -32,6 +32,10 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glViewport;
 
+/**
+ * This class controls the GLFW window
+ * @author Matt
+ */
 public class Window {
 
     private final long window;
@@ -41,6 +45,12 @@ public class Window {
     private GLFWWindowSizeCallback sizeCallback;
     private Vector3f backgroundColour = new Vector3f(0.5f);
 
+    /**
+     * Will create the window
+     * @param width The width of the window in pixels
+     * @param height The height of the window in pixels
+     * @param title The title of the window
+     */
     public Window(int width, int height, String title) {
         this.width = width;
         this.height = height;
@@ -86,62 +96,114 @@ public class Window {
         glfwSetScrollCallback(window, input.getScrollCallback());
     }
 
+    /**
+     * Polls the GLFW events
+     */
     public void update() {
         glfwPollEvents();
     }
 
+    /**
+     * Swap and clear buffers
+     */
     public void render() {
         glfwSwapBuffers(window);
         glClearColor(backgroundColour.x, backgroundColour.y, backgroundColour.z, 1);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
+    /**
+     * Will free the GLFW callbacks
+     */
     public void cleanUp() {
         sizeCallback.free();
         input.cleanUp();
     }
 
+    /**
+     * Checks if the window is marked for closure
+     * @return If the window is marked for closure
+     */
     public boolean isWindowShouldClose() {
         return glfwWindowShouldClose(window);
     }
 
+    /**
+     * Mark the window for closure
+     */
     public void setWindowShouldClose() {
         glfwSetWindowShouldClose(window, true);
     }
 
+    /**
+     * Getter for glfw window
+     * @return Glfw window
+     */
     public long getWindow() {
         return window;
     }
 
+    /**
+     * Getter for input object
+     * @return Input object
+     */
     public Input getInput() {
         return input;
     }
 
+    /**
+     * Getter for the width of the window
+     * @return Window width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Getter for the height of the window
+     * @return Window height
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Getter for the title of the window
+     * @return Window title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Setter for the title of the window
+     * @param title New title of the window
+     */
     public void setTitle(String title) {
         glfwSetWindowTitle(window, title);
         this.title = title;
     }
 
+    /**
+     * Getter for the size callback
+     * @return Size callback
+     */
     public GLFWWindowSizeCallback getSizeCallback() {
         return sizeCallback;
     }
 
+    /**
+     * Getter for the window background colour
+     * @return Background colour
+     */
     public Vector3f getBackgroundColour() {
         return backgroundColour;
     }
 
+    /**
+     * Setter for the window background colour
+     * @param backgroundColour New window background colour
+     */
     public void setBackgroundColour(Vector3f backgroundColour) {
         this.backgroundColour = backgroundColour;
     }

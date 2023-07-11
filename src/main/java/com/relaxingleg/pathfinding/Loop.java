@@ -3,12 +3,21 @@ package com.relaxingleg.pathfinding;
 import com.relaxingleg.pathfinding.io.Input;
 import com.relaxingleg.pathfinding.io.Window;
 
+/**
+ * The main loop of the engine
+ * Also contains the main method
+ * @author Matt
+ */
 public class Loop {
 
     private Window window;
     private Input input;
     private float deltaTime;
 
+    /**
+     * The main method of the program
+     * @param args The args of the JVM
+     */
     public static void main(String[] args) {
         Loop loop = new Loop();
         loop.loop();
