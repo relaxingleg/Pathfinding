@@ -5,6 +5,9 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LAST;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
@@ -19,6 +22,7 @@ public class Input {
     private GLFWMouseButtonCallback mouseButtonCallback;
     private GLFWCursorPosCallback cursorPosCallback;
     private GLFWScrollCallback scrollCallback;
+    private List<InputListener> inputListeners = new ArrayList<>();
     private boolean[] keys = new boolean[GLFW_KEY_LAST];
     private boolean[] buttons = new boolean[GLFW_MOUSE_BUTTON_LAST];
     private double mouseX, mouseY;
@@ -32,12 +36,24 @@ public class Input {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 keys[key] = (action != GLFW_RELEASE);
+                if(action == GLFW_RELEASE) return;
+                for(InputListener inputListener : inputListeners) {
+                    if(inputListener.input() == key) {
+                        inputListener.runnable().run();
+                    }
+                }
             }
         };
         mouseButtonCallback = new GLFWMouseButtonCallback() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
                 buttons[button] = (action != GLFW_RELEASE);
+                if(action == GLFW_RELEASE) return;
+                for(InputListener inputListener : inputListeners) {
+                    if(inputListener.input() == button) {
+                        inputListener.runnable().run();
+                    }
+                }
             }
         };
         cursorPosCallback = new GLFWCursorPosCallback() {
@@ -54,6 +70,14 @@ public class Input {
                 scrollY += yoffset;
             }
         };
+    }
+
+    /**
+     * Adds an input listener to the list of input listeners
+     * @param inputListener The input listener to add
+     */
+    public void addInputListener(InputListener inputListener) {
+        inputListeners.add(inputListener);
     }
 
     /**
