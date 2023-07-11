@@ -20,6 +20,7 @@ public class Loop {
     private Input input;
     private Renderer renderer;
     private float deltaTime;
+    private GridController gridController;
 
     /**
      * The main method of the program
@@ -34,6 +35,7 @@ public class Loop {
         window = new Window(1920, 1080, "Pathfinding");
         input = window.getInput();
         renderer = new Renderer();
+        gridController = new GridController(10);
     }
 
     private void loop() {
@@ -55,7 +57,7 @@ public class Loop {
 
     private void render() {
         window.render();
-        renderer.render(window, List.of(new Cell(0, 0, new Vector3f(1))), 10, false);
+        renderer.render(window, gridController.getCells(), gridController.getSize(), true);
     }
 
     private void cleanUp() {

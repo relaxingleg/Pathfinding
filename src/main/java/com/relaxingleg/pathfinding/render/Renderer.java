@@ -75,7 +75,7 @@ public class Renderer {
         glEnableVertexAttribArray(0);
         for(Cell cell : cells) {
             float x = -1+margin*2+(width*2*cell.getX())+width;
-            float y = (1-height*cell.getY())-height;
+            float y = (1-height*cell.getY()*2)-height;
             shader.loadColour(cell.getColour());
             shader.loadBoarder(bordersActive);
             shader.loadTransformationMatrix(Maths.createTransformationMatrix(new Vector2f(x, y), new Vector2f(width, height)));
