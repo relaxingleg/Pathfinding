@@ -1,6 +1,9 @@
 package com.relaxingleg.pathfinding.render;
 
+import com.relaxingleg.pathfinding.utils.Maths;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
+import org.w3c.dom.UserDataHandler;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -28,6 +31,7 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
  */
 public class Renderer {
 
+    private final Shader shader = new Shader();
     private final int vaoID;
     private final int vboID;
 
@@ -57,15 +61,20 @@ public class Renderer {
      * Renders a set of cells
      * @param cells All the cells to be rendered
      * @param size The size of the current grid
+     * @param bordersActive If the cell borders are active
      */
-    public void render(List<Cell> cells, int size) {
+    public void render(List<Cell> cells, int size, boolean bordersActive) {
+        shader.start();
         glBindVertexArray(vaoID);
         glEnableVertexAttribArray(0);
         for(Cell cell : cells) {
+            shader.loadColour(cell.getColour());
+            shader.loadBoarder(bordersActive);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
         glDisableVertexAttribArray(0);
         glBindVertexArray(0);
+        shader.stop();
     }
 
     /**

@@ -55,7 +55,7 @@ public class Loop {
 
     private void render() {
         window.render();
-        renderer.render(List.of(new Cell(0, 0, new Vector3f())), 10);
+        renderer.render(List.of(new Cell(0, 0, new Vector3f(1))), 10, false);
     }
 
     private void cleanUp() {
