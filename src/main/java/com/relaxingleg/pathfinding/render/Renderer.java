@@ -1,5 +1,6 @@
 package com.relaxingleg.pathfinding.render;
 
+import com.relaxingleg.pathfinding.io.Window;
 import com.relaxingleg.pathfinding.utils.Maths;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -59,17 +60,25 @@ public class Renderer {
 
     /**
      * Renders a set of cells
+     * @param window The window
      * @param cells All the cells to be rendered
      * @param size The size of the current grid
      * @param bordersActive If the cell borders are active
      */
-    public void render(List<Cell> cells, int size, boolean bordersActive) {
+    public void render(Window window, List<Cell> cells, int size, boolean bordersActive) {
+        float aspectRatio = (float)window.getHeight()/window.getWidth();
+        float height = 1f/size;
+        float width = height*aspectRatio;
+        float margin = (1-(width*size))/2;
         shader.start();
         glBindVertexArray(vaoID);
         glEnableVertexAttribArray(0);
         for(Cell cell : cells) {
+            float x = -1+margin*2+(width*2*cell.getX())+width;
+            float y = (1-height*cell.getY())-height;
             shader.loadColour(cell.getColour());
             shader.loadBoarder(bordersActive);
+            shader.loadTransformationMatrix(Maths.createTransformationMatrix(new Vector2f(x, y), new Vector2f(width, height)));
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
         glDisableVertexAttribArray(0);
