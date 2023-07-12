@@ -35,7 +35,7 @@ public class Loop {
         window = new Window(1920, 1080, "Pathfinding");
         input = window.getInput();
         renderer = new Renderer();
-        gridController = new GridController(10, input, window);
+        gridController = new GridController(25, input, window);
     }
 
     private void loop() {
@@ -53,6 +53,7 @@ public class Loop {
 
     private void update() {
         window.update();
+        gridController.update();
     }
 
     private void render() {
