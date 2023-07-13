@@ -9,6 +9,7 @@ import com.relaxingleg.pathfinding.utils.Heap;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
@@ -28,7 +29,7 @@ public class GridController {
     public static final Vector3f OPEN_COLOUR = new Vector3f(0, 0, 0.75f);
     public static final Vector3f CLOSED_COLOUR = new Vector3f(0.75f, 0, 0);
     private final int size;
-    private List<Cell> empty = new ArrayList<>();
+    private Cell[][] empty;
     private List<Cell> blocked = new ArrayList<>();
     private Heap<Cell> open = new Heap<>(new CellComparator());
     private List<Cell> closed = new ArrayList<>();
@@ -69,14 +70,12 @@ public class GridController {
 
             if((gridX == 0 && gridY == 0) || (gridX == size-1 && gridY == size-1)) return;
 
-            for(int i = 0; i < empty.size(); i++) {
-                Cell cell = empty.get(i);
-                if(cell.getX() == gridX && cell.getY() == gridY) {
-                    empty.remove(cell);
-                    cell.setColour(BLOCKED_COLOUR);
-                    blocked.add(cell);
-                    return;
-                }
+            if(empty[gridX][gridY] != null) {
+                Cell cell = empty[gridX][gridY];
+                empty[gridX][gridY] = null;
+                cell.setColour(BLOCKED_COLOUR);
+                blocked.add(cell);
+                return;
             }
 
             for(int i = 0; i < blocked.size(); i++) {
@@ -84,7 +83,7 @@ public class GridController {
                 if(cell.getX() == gridX && cell.getY() == gridY) {
                     blocked.remove(cell);
                     cell.setColour(EMPTY_COLOUR);
-                    empty.add(cell);
+                    empty[gridX][gridY] = cell;
                     return;
                 }
             }
@@ -119,13 +118,15 @@ public class GridController {
             }
         });
 
-        for(int i = 0; i < empty.size(); i++) {
-            Cell cell = empty.get(i);
-            boolean flag1 = cell.getX() >= currentCell.getX()-1;
-            boolean flag2 = cell.getX() <= currentCell.getX()+1;
-            boolean flag3 = cell.getY() >= currentCell.getY()-1;
-            boolean flag4 = cell.getY() <= currentCell.getY()+1;
-            if(flag1 && flag2 && flag3 && flag4) {
+        for(int x = -1; x < 2; x++) {
+            for(int y = -1; y < 2; y++) {
+                Cell cell;
+                try {
+                    cell = empty[currentCell.getX() + x][currentCell.getY() + y];
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    continue;
+                }
+                if(cell == null) continue;
                 neighbours.add(cell);
             }
         }
@@ -134,7 +135,7 @@ public class GridController {
             int newGCost = currentCell.getgCost() + getDistance(cell, currentCell);
             int newHCost = getDistance(cell, new Cell(size-1, size-1, null));
             if(cell.getgCost() == -1) {
-                empty.remove(cell);
+                empty[cell.getX()][cell.getY()] = null;
                 cell.setParent(currentCell);
                 cell.setgCost(newGCost);
                 cell.sethCost(newHCost);
@@ -171,7 +172,7 @@ public class GridController {
     }
 
     private void createEmptyGrid(int size) {
-        empty.clear();
+        empty = new Cell[size][size];
         blocked.clear();
         open.clear();
         closed.clear();
@@ -185,10 +186,10 @@ public class GridController {
                     open.put(startCell);
                     continue;
                 } else if(x == size-1 && y == size-1) {
-                    empty.add(new Cell(x, y, CHECKPOINT_COLOUR));
+                    empty[x][y] = new Cell(x, y, CHECKPOINT_COLOUR);
                     continue;
                 }
-                empty.add(new Cell(x, y, EMPTY_COLOUR));
+                empty[x][y] = new Cell(x, y, EMPTY_COLOUR);
             }
         }
     }
@@ -199,7 +200,12 @@ public class GridController {
      */
     public List<Cell> getCells() {
         List<Cell> cells = new ArrayList<>();
-        cells.addAll(empty);
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
+                Cell cell = empty[i][j];
+                if(cell != null) cells.add(cell);
+            }
+        }
         cells.addAll(blocked);
         cells.addAll(open.getAllItems());
         cells.addAll(closed);
