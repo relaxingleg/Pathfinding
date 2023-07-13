@@ -4,9 +4,11 @@ import com.relaxingleg.pathfinding.io.Input;
 import com.relaxingleg.pathfinding.io.Window;
 import com.relaxingleg.pathfinding.render.Cell;
 import com.relaxingleg.pathfinding.render.Renderer;
+import com.relaxingleg.pathfinding.utils.Heap;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**

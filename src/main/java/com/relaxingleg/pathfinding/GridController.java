@@ -4,6 +4,8 @@ import com.relaxingleg.pathfinding.io.Input;
 import com.relaxingleg.pathfinding.io.InputListener;
 import com.relaxingleg.pathfinding.io.Window;
 import com.relaxingleg.pathfinding.render.Cell;
+import com.relaxingleg.pathfinding.utils.CellComparator;
+import com.relaxingleg.pathfinding.utils.Heap;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ public class GridController {
     private final int size;
     private List<Cell> empty = new ArrayList<>();
     private List<Cell> blocked = new ArrayList<>();
-    private List<Cell> open = new ArrayList<>();
+    private Heap<Cell> open = new Heap<>(new CellComparator());
     private List<Cell> closed = new ArrayList<>();
     private boolean placement = true;
     private boolean pathFound = false;
@@ -95,14 +97,8 @@ public class GridController {
     public void update() {
         if(placement || pathFound) return;
 
-        Cell currentCell = open.get(0);
-        for(int i = 1; i < open.size(); i++) {
-            if((currentCell.getgCost() + currentCell.gethCost()) > (open.get(i).getgCost() + open.get(i).gethCost())) {
-                currentCell = open.get(i);
-            }
-        }
+        Cell currentCell = open.pop();
 
-        open.remove(currentCell);
         closed.add(currentCell);
         currentCell.setColour(CLOSED_COLOUR);
 
@@ -113,7 +109,7 @@ public class GridController {
         }
 
         List<Cell> neighbours = new ArrayList<>();
-        for(Cell cell : open) {
+        open.forEach((cell) -> {
             boolean flag1 = cell.getX() >= currentCell.getX()-1;
             boolean flag2 = cell.getX() <= currentCell.getX()+1;
             boolean flag3 = cell.getY() >= currentCell.getY()-1;
@@ -121,7 +117,7 @@ public class GridController {
             if(flag1 && flag2 && flag3 && flag4) {
                 neighbours.add(cell);
             }
-        }
+        });
 
         for(int i = 0; i < empty.size(); i++) {
             Cell cell = empty.get(i);
@@ -143,7 +139,7 @@ public class GridController {
                 cell.setgCost(newGCost);
                 cell.sethCost(newHCost);
                 cell.setColour(OPEN_COLOUR);
-                open.add(cell);
+                open.put(cell);
             } else {
                 int oldFCost = cell.getgCost() + cell.gethCost();
                 int newFCost = newGCost + newHCost;
@@ -186,7 +182,7 @@ public class GridController {
                     Cell startCell = new Cell(x, y, CHECKPOINT_COLOUR);
                     startCell.setgCost(0);
                     startCell.sethCost(getDistance(startCell, new Cell(size-1, size-1, null)));
-                    open.add(startCell);
+                    open.put(startCell);
                     continue;
                 } else if(x == size-1 && y == size-1) {
                     empty.add(new Cell(x, y, CHECKPOINT_COLOUR));
@@ -205,7 +201,7 @@ public class GridController {
         List<Cell> cells = new ArrayList<>();
         cells.addAll(empty);
         cells.addAll(blocked);
-        cells.addAll(open);
+        cells.addAll(open.getAllItems());
         cells.addAll(closed);
         return cells;
     }
